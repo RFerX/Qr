@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extractor Data Deposit & Trx. Id</title>
+    <style>
+        /* CSS Baru: Termasuk Efek Blink BLAZZPAY */
+        :root {
+            --primary-color: #4f46e5; /* Biru/Ungu Primer */
+            --primary-hover: #3730a3;
+            --background-light: #f4f6f8;
+            --card-background: #ffffff;
+            --border-color: #e0e0e0;
+            --success-color: #10b981;
+            --delete-color: #dc3545; /* Merah untuk tombol hapus */
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 40px 20px;
+            
+            background-color: var(--background-light); 
+            background-image: url('bg.jpg');          
+            background-size: cover;                   
+            background-position: center center;       
+            background-attachment: fixed;             
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95); 
+        }
+        
+        /* --- STYLING BLAZZPAY LOGO BARU --- */
+        .BLAZZPAY-logo {
+            font-size: 3em; /* Font besar */
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(79, 70, 229, 0.8);
+            animation: fast-blink 0.2s infinite alternate; /* Animasi kedip cepat */
+        }
+
+        /* Definisi Animasi Kedip */
+        @keyframes fast-blink {
+            0% {
+                color: var(--primary-color); /* Warna Ungu Penuh */
+                opacity: 1;
+            }
+            50% {
+                color: #ff00ff; /* Warna Ungu Terang/Magenta untuk efek blink */
+                opacity: 0.5;
+            }
+            100% {
+                color: var(--primary-color);
+                opacity: 1;
+            }
+        }
+        
+        /* Input Area */
+        textarea {
+            width: 100%; 
+            font-family: monospace; 
+            border-radius: 8px; 
+            padding: 15px; 
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            min-height: 180px;
+            margin-bottom: 15px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button { 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: 8px; 
+            color: white; 
+            font-size: 16px; 
+            cursor: pointer; 
+            transition: background-color 0.3s, transform 0.1s;
+            flex-grow: 1; 
+            min-width: 150px;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #processBtn {
+            background: var(--primary-color);
+        }
+        #processBtn:hover { 
+            background: var(--primary-hover); 
+        }
+
+        .copy-btn {
+            background: var(--success-color); 
+        }
+        .copy-btn:hover {
+            background: #059669; 
+        }
+        
+        #removeHeaderBtn {
+            background: var(--delete-color); /* Tombol Hapus */
+            flex-grow: 0;
+        }
+        #removeHeaderBtn:hover {
+            background: #c82333;
+        }
+
+        /* Results Area */
+        .result-group {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        .output-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: block;
+            font-size: 1.1em;
+        }
+        
+        /* Styling Tabel */
+        #outputTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0;
+            background: var(--card-background);
+        }
+        #outputTable th, #outputTable td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        #outputTable th {
+            background-color: var(--background-light);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        #outputTable tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        #outputTable tr:hover {
+            background-color: #f0f0ff;
+        }
+        
+        @media (min-width: 768px) {
+            .button-group {
+                gap: 15px;
+                display: flex; /* Kembalikan ke flex untuk desktop */
+            }
+            button {
+                flex-grow: 0;
+                min-width: unset;
+            }
+            #processBtn {
+                margin-right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="BLAZZPAY-logo">BLAZZPAY</div>
+    
+    <textarea id="inputData" rows="12" placeholder="Input data here."></textarea>
+    
+    <div class="button-group">
+        <button id="processBtn" onclick="processDataByLineCount()">Convert 🚀</button>
+        <button id="removeHeaderBtn" onclick="removeHeader()">Delete Title 🗑️</button>
+        <button class="copy-btn" onclick="copyTrxIdAndTotal()">Copy Name & Deposit</button>
+        <button class="copy-btn" onclick="copyUsername()">Copy Username</button> 
+    </div>
+    
+    <div class="result-group">
+        <div id="outputContainer">
+            <p>⚠️ Please paste transaction data first.</p> </div>
+    </div>
+    
+    <p id="message" style="color: red;"></p>
+</div>
+
+<script>
+const LINES_PER_TRANSACTION = 5;
+let globalExtractedData = [];
+
+// FUNGSI UNTUK HAPUS HEADER
+function removeHeader() {
+    const textarea = document.getElementById('inputData');
+    const rawData = textarea.value;
+    
+    if (!rawData.trim()) {
+        alert("Textarea is empty, no title to delete."); // ALERT BARU
+        return;
+    }
+    
+    const lines = rawData.split(/\r?\n/);
+    
+    if (lines.length > 0) {
+        lines.shift(); 
+        textarea.value = lines.join('\n').trim();
+        alert("Deleted Successfully ✅");
+    } else {
+        alert("No data found for processing."); // ALERT BARU
+    }
+}
+
+
+function processDataByLineCount() {
+    const rawData = document.getElementById('inputData').value;
+    const outputContainer = document.getElementById('outputContainer');
+    outputContainer.innerHTML = '';
+    globalExtractedData = [];
+    
+    if (!rawData.trim()) {
+        outputContainer.innerHTML = '<p>⚠️ Please paste transaction data first.</p>'; // PESAN ERROR BARU
+        return;
+    }
+
+    const rawLines = rawData.split(/\r?\n/);
+    
+    // --- Langkah Ekstraksi (Logika 5 Baris Tetap) ---
+    for (let i = 0; i < rawLines.length; i += LINES_PER_TRANSACTION) {
+        let transactionBlock = '';
+        for (let j = 0; j < LINES_PER_TRANSACTION; j++) {
+            if (i + j < rawLines.length) {
+                let line = rawLines[i + j].replace(/"/g, '').trim();
+                transactionBlock += line + ' '; 
+            }
+        }
+        
+        if (!transactionBlock.trim()) continue;
+
+        let no, username, total, trxId;
+        
+        const noMatch = transactionBlock.match(/^(\d+)\s+([a-zA-Z0-9]+)/);
+        if (noMatch && noMatch[1]) {
+            no = noMatch[1].trim();
+        }
+
+        const usernameMatch = transactionBlock.match(/P:\s*[\d\/: ]+\s*([a-zA-Z0-9]+)\s*---/);
+        if (usernameMatch && usernameMatch[1]) {
+            username = usernameMatch[1].trim();
+        }
+
+        const totalMatch = transactionBlock.match(/QRIS BLAZZPAY\s*(Rp [\d\.]+)/);
+        if (totalMatch && totalMatch[1]) {
+            total = totalMatch[1].trim();
+        }
+        
+        const trxIdMatch = transactionBlock.match(/Transaksi\sId:\s*(\w+)/);
+        if (trxIdMatch && trxIdMatch[1]) {
+            trxId = trxIdMatch[1].trim(); 
+        }
+
+        if (no && username && total && trxId) { 
+            globalExtractedData.push({
+                no: parseInt(no),
+                username: username,
+                total: total,
+                trxId: trxId
+            });
+        }
+    }
+    
+    // --- Sorting Descending (Z-A) berdasarkan Kolom 'No' ---
+    globalExtractedData.sort((a, b) => b.no - a.no);
+
+    // Menampilkan Tabel
+    if (globalExtractedData.length > 0) {
+        renderTable(globalExtractedData);
+    } else {
+        outputContainer.innerHTML = '<p>⚠️ No valid transaction data found. Ensure each transaction consists of 5 lines.</p>'; // PESAN ERROR BARU
+    }
+}
+
+// Fungsi untuk membuat tabel di HTML
+function renderTable(data) {
+    // Urutan Kolom: No | Name | Deposit | Username
+    let html = '';
+    html += '<table id="outputTable"><thead><tr><th>No</th><th>Name</th><th>Deposit</th><th>Username</th></tr></thead><tbody>';
+    
+    data.forEach(row => {
+        html += `<tr>
+            <td>${row.no}</td>
+            <td>${row.trxId}</td>
+            <td>${row.total}</td>
+            <td>${row.username}</td>
+        </tr>`;
+    });
+    
+    html += '</tbody></table>';
+    document.getElementById('outputContainer').innerHTML = html;
+}
+
+// --- FUNGSI COPY ---
+
+function copyToClipboard(textToCopy, successMessage) {
+    if (globalExtractedData.length === 0) {
+        alert("Please process the data first."); // ALERT BARU
+        return;
+    }
+    if (!textToCopy.trim()) {
+        alert("No data found for copying."); // ALERT BARU
+        return;
+    }
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                alert(`${successMessage} ✅`);
+            })
+            .catch(err => {
+                console.error('Could not copy text: ', err);
+                fallbackCopy(textToCopy, successMessage);
+            });
+    } else {
+        fallbackCopy(textToCopy, successMessage);
+    }
+}
+
+function fallbackCopy(text, successMessage) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.opacity = "0";
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+        document.execCommand('copy');
+        alert(`${successMessage} ✅ (Fallback)`);
+    } catch (err) {
+        alert('❌ Failed to copy text automatically. Please copy manually from the text box.'); // ALERT BARU
+    }
+
+    document.body.removeChild(textArea);
+}
+
+
+function copyTrxIdAndTotal() {
+    let tsv = ''; 
+    
+    globalExtractedData.forEach(row => {
+        const cleanTotal = row.total.replace('Rp', '').replace(/\./g, '').trim(); 
+        tsv += `${row.trxId}\t${cleanTotal}\n`;
+    });
+
+    copyToClipboard(tsv, 'Name and Deposit copied!');
+}
+
+function copyUsername() {
+    let tsv = '';
+    
+    globalExtractedData.forEach(row => {
+        tsv += `${row.username}\n`;
+    });
+
+    copyToClipboard(tsv, 'Username copied!');
+}
+
+function copyTableData() {
+    alert("This function has been replaced by the specific Copy buttons."); // ALERT BARU
+}
+</script>
+</body>
+</html>
