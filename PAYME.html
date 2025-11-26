@@ -260,7 +260,7 @@ function processDataByLineCount() {
             username = usernameMatch[1].trim();
         }
 
-        const totalMatch = transactionBlock.match(/QRIS PAYME\s*(Rp [\d\.]+)/);
+        const totalMatch = transactionBlock.match(/AUTO PROSES 1 DETIK\s*(Rp [\d\.]+)/);
         if (totalMatch && totalMatch[1]) {
             total = totalMatch[1].trim();
         }
@@ -388,3 +388,4 @@ function copyTableData() {
 </body>
 
 </html>
+
