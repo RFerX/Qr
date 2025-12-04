@@ -204,7 +204,7 @@
             document.getElementById('copyMessage').innerHTML = '';    
 
             if (rawData.trim() === "") {
-                outputArea.innerHTML = "<p class='error-message'>⚠️ Harap masukkan data terlebih dahulu!</p>";
+                outputArea.innerHTML = "<p class='error-message'>⚠️ Please enter data first!</p>";
                 return;
             }
 
@@ -212,7 +212,7 @@
             const numColumnsTotal = 9; 
 
             if (!parts || parts.length < numColumnsTotal) { 
-                outputArea.innerHTML = "<p class='message' style='color: orange;'>⚠️ Data tidak valid atau tidak lengkap.</p>";
+                outputArea.innerHTML = "<p class='message' style='color: orange;'>⚠️ Invalid or incomplete data.</p>";
                 return;
             }
 
@@ -224,7 +224,7 @@
             const dataRowsAll = cleanedValues.slice(numColumnsTotal);
 
             if (dataRowsAll.length < numColumnsTotal) {
-                outputArea.innerHTML = "<p class='message' style='color: orange;'>⚠️ Tidak ada data untuk dikonversi selain header.</p>";
+                outputArea.innerHTML = "<p class='message' style='color: orange;'>⚠️ There is no data to convert other than headers.</p>";
                 return;
             }
 
@@ -302,7 +302,7 @@
             let cleanCount = 0;
 
             if (!table) {
-                copyMessage.innerHTML = "<p class='error-message'>⚠️ Harap konversi data terlebih dahulu.</p>";
+                copyMessage.innerHTML = "<p class='error-message'>⚠️ Please convert data first.</p>";
                 return;
             }
 
@@ -332,9 +332,9 @@
             });
 
             if (cleanCount > 0) {
-                replaceMessage.innerHTML = `<p class="success-message">🧹 Berhasil **menghapus baris kedua** pada **${cleanCount} baris** di kolom Komentar.</p>`;
+                replaceMessage.innerHTML = `<p class="success-message">🧹 No second line found to clear</p>`;
             } else {
-                replaceMessage.innerHTML = "<p class='message' style='color: orange;'>ℹ️ Tidak ditemukan baris kedua untuk dibersihkan.</p>";
+                replaceMessage.innerHTML = "<p class='message' style='color: orange;'>ℹ️ No second line found to delete.</p>";
             }
         }
         
@@ -347,12 +347,12 @@
             let replaceCount = 0;
 
             if (!table) {
-                replaceMessage.innerHTML = "<p class='error-message'>⚠️ Harap konversi data terlebih dahulu.</p>";
+                replaceMessage.innerHTML = "<p class='error-message'>⚠️ Please convert data first.</p>";
                 return;
             }
 
             if (searchText === "") {
-                replaceMessage.innerHTML = "<p class='error-message'>⚠️ Teks yang akan dihapus tidak boleh kosong.</p>";
+                replaceMessage.innerHTML = "<p class='error-message'>⚠️ The text to be deleted cannot be empty.</p>";
                 return;
             }
 
@@ -380,9 +380,9 @@
             });
 
             if (replaceCount > 0) {
-                replaceMessage.innerHTML = `<p class="success-message">✅ Berhasil **menghapus** ${replaceCount} kemunculan di kolom Komentar.</p>`;
+                replaceMessage.innerHTML = `<p class="success-message">✅ Succeed **delete** ${replaceCount} appears in the Comments column.</p>`;
             } else {
-                replaceMessage.innerHTML = "<p class='message' style='color: orange;'>ℹ️ Tidak ditemukan kemunculan teks yang dicari.</p>";
+                replaceMessage.innerHTML = "<p class='message' style='color: orange;'>ℹ️ No occurrences of the searched text were found..</p>";
             }
         }
 
@@ -391,9 +391,9 @@
             const copyMessage = document.getElementById('copyMessage');
             try {
                 await navigator.clipboard.writeText(data);
-                copyMessage.innerHTML = "<p class='success-message'>✅ Data berhasil disalin ke clipboard!</p>";
+                copyMessage.innerHTML = "<p class='success-message'>✅ Data successfully copied to clipboard!</p>";
             } catch (err) {
-                copyMessage.innerHTML = `<p class='error-message'>❌ Gagal menyalin: ${err}</p>`;
+                copyMessage.innerHTML = `<p class='error-message'>❌ Failed to copy: ${err}</p>`;
                 console.error('Copy failed: ', err);
             }
         }
@@ -403,7 +403,7 @@
             const copyMessage = document.getElementById('copyMessage');
 
             if (!table) {
-                copyMessage.innerHTML = "<p class='error-message'>⚠️ Harap konversi data terlebih dahulu.</p>";
+                copyMessage.innerHTML = "<p class='error-message'>⚠️ Please convert data first.</p>";
                 return null;
             }
 
