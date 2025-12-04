@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alat Konversi Data Filtered ke Tabel</title>
+    <title>Qr</title>
     <style>
         /* --- STYLING EFEK SALJU JATUH --- */
         .snowflake {
@@ -14,7 +14,6 @@
             position: fixed;
             top: -10%;
             z-index: 1000;
-            /* Animasi akan ditambahkan oleh JS */
         }
         @keyframes fall {
             0% { top: -10%; opacity: 1; }
@@ -25,21 +24,19 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            /* --- KODE BACKGROUND BARU (Tetap) --- */
-            background-image: url('bg.jpg'); 
+            background-image: url('bg.jpg'); /* Pastikan file bg.jpg ada */
             background-attachment: fixed;
             background-size: cover; 
-            background-color: #f4f4f4; /* Warna fallback */
-            /* ---------------------------- */
+            background-color: #f4f4f4; 
         }
         .container {
             max-width: 95%; 
             margin: auto;
-            background: rgba(255, 255, 255, 0.1); /* Sedikit lebih solid untuk keterbacaan */
+            background: rgba(255, 255, 255, 0.1); 
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            position: relative; /* Penting untuk menjaga elemen di atas salju */
+            position: relative; 
         }
         textarea {
             width: 100%;
@@ -51,7 +48,6 @@
             resize: vertical;
             background-color: rgba(255, 255, 255, 0.9);
         }
-        /* Styling untuk semua tombol */
         button {
             background-color: #5cb85c;
             color: white;
@@ -60,15 +56,13 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 10px; 
             margin-right: 10px; 
             transition: background-color 0.3s;
         }
         button:hover {
             background-color: #4cae4c;
         }
-
-        /* Styling spesifik untuk Find and Replace */
         .find-replace-area {
             border: 1px solid #ddd;
             padding: 15px;
@@ -83,6 +77,7 @@
             margin-right: 10px;
             width: 300px; 
             box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.9);
         }
         #findReplaceButton {
             background-color: #dc3545; 
@@ -90,8 +85,6 @@
         #findReplaceButton:hover {
             background-color: #c82333;
         }
-        
-        /* Styling spesifik untuk tombol Copy */
         .copy-area button {
             background-color: #3498db; 
             margin-right: 10px;
@@ -107,13 +100,19 @@
             margin-bottom: 20px;
             background-color: #f0fff0;
         }
-
-        /* Styling untuk Tabel Hasil */
+        #cleanCommentButton {
+            background-color: #ffc107; 
+            color: #333;
+            font-weight: bold;
+        }
+        #cleanCommentButton:hover {
+            background-color: #e0a800;
+        }
         #outputResult table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
-            background-color: white; /* Pastikan tabel terlihat di atas background transparan */
+            background-color: white; 
         }
         #outputResult th, #outputResult td {
             border: 1px solid #ddd;
@@ -129,7 +128,6 @@
         #outputResult tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        /* Styling tambahan untuk kolom Total */
         .col-total { text-align: right; font-weight: bold; }
         .message {
             margin-top: 10px;
@@ -146,9 +144,9 @@
 <body>
     <div id='snow-container'></div> 
     <div class="container">
-        <h2>Konverter Data</h2>
+        <h2>Convert Data</h2>
 
-        <label for="inputData">Masukkan Data Anda di Bawah:</label>
+        <label for="inputData">Input Your Data Below:</label>
         <textarea 
             id="inputData" 
             rows="10" 
@@ -160,21 +158,28 @@
         </button>
 
         <div class="find-replace-area">
-            <h4>Pencarian dan Penghapusan (Kolom Komentar)</h4>
-            <label for="searchText">Hapus Teks/Kata:</label>
+            <h4>Filtering</h4>
+            
+            <button id="cleanCommentButton" onclick="handleCleanCommentColumn()">
+                🧹 Delete Line 2
+            </button>
+            
+            <br style="margin-top: 10px;">
+
+            <label for="searchText">Delete Text:</label>
             <input type="text" id="searchText" placeholder="Teks yang akan dihapus">
             <button id="findReplaceButton" onclick="handleFindAndReplace()">
-                🗑️ Cari dan Hapus
+                🗑️ Find & Delete
             </button>
             <div id="replaceMessage" class="message"></div>
         </div>
         <div class="copy-area">
-            <h4>Penyalinan Cepat</h4>
+            <h4>Copying</h4>
             <button id="copyCommentTotalButton" onclick="handleCopyCommentAndTotal()">
-                📋 Copy Komentar & Total (Hanya Data)
+                📋 Copy Name
             </button>
             <button id="copyUsernameButton" onclick="handleCopyUsername()">
-                📋 Copy Username (Hanya Data)
+                📋 Copy Username
             </button>
             <div id="copyMessage" class="message"></div>
         </div>
@@ -191,12 +196,12 @@
         const totalColumnIndex = selectedColumnsIndices.indexOf(5);    // Index 2
         const usernameColumnIndex = selectedColumnsIndices.indexOf(2);  // Index 3
 
-        // --- FUNGSI UTAMA UNTUK CONVERT ---
+        // --- FUNGSI UTAMA UNTUK CONVERT (DENGAN SORT DESCENDING BERDASARKAN KOLOM NO) ---
         function handleConvert() {
             const rawData = document.getElementById('inputData').value;
             const outputArea = document.getElementById('outputResult');
             document.getElementById('replaceMessage').innerHTML = ''; 
-            document.getElementById('copyMessage').innerHTML = '';   
+            document.getElementById('copyMessage').innerHTML = '';    
 
             if (rawData.trim() === "") {
                 outputArea.innerHTML = "<p class='error-message'>⚠️ Harap masukkan data terlebih dahulu!</p>";
@@ -219,8 +224,8 @@
             const dataRowsAll = cleanedValues.slice(numColumnsTotal);
 
             if (dataRowsAll.length < numColumnsTotal) {
-                    outputArea.innerHTML = "<p class='message' style='color: orange;'>⚠️ Tidak ada data untuk dikonversi selain header.</p>";
-                    return;
+                outputArea.innerHTML = "<p class='message' style='color: orange;'>⚠️ Tidak ada data untuk dikonversi selain header.</p>";
+                return;
             }
 
             const selectedHeaders = [];
@@ -230,8 +235,28 @@
                 }
             });
 
+            // --- LOGIKA PENGUMPULAN DATA BARIS PENUH ---
+            const fullRowsData = [];
+            for (let i = 0; i < dataRowsAll.length; i += numColumnsTotal) {
+                if (dataRowsAll.slice(i, i + numColumnsTotal).length === numColumnsTotal) {
+                    fullRowsData.push(dataRowsAll.slice(i, i + numColumnsTotal));
+                }
+            }
+
+            // --- LANGKAH BARU: SORTING BERDASARKAN KOLOM NO (Index 0) SECARA DESCENDING ---
+            const noColumnIndex = 0; // Kolom "No" selalu berada di index 0 di dataRowsAll
+
+            fullRowsData.sort((rowA, rowB) => {
+                // Hapus tanda kutip ganda dan konversi ke angka untuk perbandingan numerik
+                const numA = parseInt(rowA[noColumnIndex].replace(/"/g, '').trim());
+                const numB = parseInt(rowB[noColumnIndex].replace(/"/g, '').trim());
+
+                // Sort Descending (menurun): B - A
+                return numB - numA;
+            });
+
             // --- Membuat HTML Tabel ---
-            let tableHTML = '<h3>Hasil Filtered</h3>';
+            let tableHTML = '<h3>Filter Results</h3>';
             tableHTML += '<table id="convertedTable">'; 
             
             // Header
@@ -245,24 +270,22 @@
 
             // Baris Data
             tableHTML += '<tbody>';
-            for (let i = 0; i < dataRowsAll.length; i += numColumnsTotal) {
-                const rowDataFull = dataRowsAll.slice(i, i + numColumnsTotal);
+            
+            // Gunakan array yang sudah diurutkan (fullRowsData)
+            fullRowsData.forEach(rowDataFull => {
+                tableHTML += '<tr>';
+                
+                selectedColumnsIndices.forEach(index => {
+                    const cellData = rowDataFull[index];
+                    const cleanCellData = cellData ? cellData.replace(/^"|"$/g, '').trim().replace(/\n/g, '<br>') : '';
 
-                if (rowDataFull.length === numColumnsTotal) {
-                    tableHTML += '<tr>';
+                    const isTotalCol = (index === 5);
+                    const cssClass = isTotalCol ? 'col-total' : '';
                     
-                    selectedColumnsIndices.forEach(index => {
-                        const cellData = rowDataFull[index];
-                        const cleanCellData = cellData ? cellData.replace(/^"|"$/g, '').trim().replace(/\n/g, '<br>') : '';
-
-                        const isTotalCol = (index === 5);
-                        const cssClass = isTotalCol ? 'col-total' : '';
-                        
-                        tableHTML += `<td class="${cssClass}">${cleanCellData}</td>`;
-                    });
-                    tableHTML += '</tr>';
-                }
-            }
+                    tableHTML += `<td class="${cssClass}">${cleanCellData}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
             
             tableHTML += '</tbody>';
             tableHTML += '</table>';
@@ -271,7 +294,51 @@
             outputArea.innerHTML = tableHTML;
         }
         
-        // --- FUNGSI UNTUK FIND AND DELETE ---
+        // --- FUNGSI HAPUS BARIS KEDUA (Menargetkan tag <br>) ---
+        function handleCleanCommentColumn() {
+            const table = document.getElementById('convertedTable');
+            const replaceMessage = document.getElementById('replaceMessage'); 
+            const copyMessage = document.getElementById('copyMessage');
+            let cleanCount = 0;
+
+            if (!table) {
+                copyMessage.innerHTML = "<p class='error-message'>⚠️ Harap konversi data terlebih dahulu.</p>";
+                return;
+            }
+
+            replaceMessage.innerHTML = '';
+            copyMessage.innerHTML = '';
+
+            const rows = table.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+
+                if (cells.length > commentColumnIndex) {
+                    const commentCell = cells[commentColumnIndex];
+                    
+                    let originalHTML = commentCell.innerHTML;
+                    
+                    // Regex: Cari tag <br> diikuti APAPUN sampai akhir.
+                    const searchRegex = /\s*<br\s*\/?>\s*.*$/i;
+                    
+                    let newHTML = originalHTML.replace(searchRegex, '').trim();
+
+                    if (originalHTML !== newHTML) {
+                        commentCell.innerHTML = newHTML; 
+                        cleanCount++;
+                    }
+                }
+            });
+
+            if (cleanCount > 0) {
+                replaceMessage.innerHTML = `<p class="success-message">🧹 Berhasil **menghapus baris kedua** pada **${cleanCount} baris** di kolom Komentar.</p>`;
+            } else {
+                replaceMessage.innerHTML = "<p class='message' style='color: orange;'>ℹ️ Tidak ditemukan baris kedua untuk dibersihkan.</p>";
+            }
+        }
+        
+        // --- FUNGSI UNTUK FIND AND DELETE (Teks Manual) ---
         function handleFindAndReplace() {
             const searchText = document.getElementById('searchText').value.trim();
             const replaceText = ''; 
@@ -346,7 +413,7 @@
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 if (cells.length > columnIndex) {
-                    let cellData = cells[columnIndex].textContent.trim();
+                    let cellData = cells[columnIndex].textContent.trim(); 
                     dataArray.push(cellData);
                 }
             });
@@ -363,7 +430,7 @@
 
             let combinedData = [];
             for (let i = 0; i < commentData.length; i++) {
-                combinedData.push(commentData[i] + '\t' + totalData[i]);
+                combinedData.push(commentData[i] + '\t' + totalData[i]); 
             }
             
             const finalData = combinedData.join('\n');
@@ -392,37 +459,27 @@
             const snowflake = document.createElement('div');
             snowflake.classList.add('snowflake');
             
-            // Pilih karakter salju acak
             snowflake.innerHTML = snowflakes[Math.floor(Math.random() * snowflakes.length)]; 
 
-            // Posisi X acak
-            snowflake.style.left = `${Math.random() * 100}%`; 
-
-            // Durasi jatuh acak (antara 5s dan 15s)
             const duration = Math.random() * 10 + 5; 
             snowflake.style.animationDuration = `${duration}s`;
 
-            // Delay awal acak agar tidak jatuh bersamaan
+            snowflake.style.left = `${Math.random() * 100}%`; 
             snowflake.style.animationDelay = `${Math.random() * 10}s`; 
 
-            // Animasi CSS
             snowflake.style.animationName = 'fall';
             snowflake.style.animationIterationCount = 'infinite';
-            snowflake.style.opacity = Math.random() * 0.5 + 0.5; // Opasitas acak
+            snowflake.style.opacity = Math.random() * 0.5 + 0.5; 
 
             snowContainer.appendChild(snowflake);
 
-            // Hapus elemen salju setelah jatuh (opsional, untuk mencegah kelebihan elemen)
             snowflake.addEventListener('animationend', function() {
                 this.remove();
-                // Buat salju baru untuk menjaga jumlah salju
                 createSnowflake(); 
             });
         }
 
-        // Buat salju sejumlah totalSnowflakes saat halaman dimuat
         for (let i = 0; i < totalSnowflakes; i++) {
-            // Gunakan setTimeout agar tidak memblokir render halaman awal
             setTimeout(createSnowflake, Math.random() * 5000); 
         }
         // ------------------------------------
