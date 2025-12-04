@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alat Konversi Data Filtered ke Tabel</title>
+    <style>
+        /* --- STYLING EFEK SALJU JATUH --- */
+        .snowflake {
+            color: #fff;
+            font-size: 1.5em;
+            font-family: Arial, sans-serif;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: -10%;
+            z-index: 1000;
+            /* Animasi akan ditambahkan oleh JS */
+        }
+        @keyframes fall {
+            0% { top: -10%; opacity: 1; }
+            100% { top: 100%; opacity: 0.5; }
+        }
+        /* --------------------------------- */
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            /* --- KODE BACKGROUND BARU (Tetap) --- */
+            background-image: url('bg.jpg'); 
+            background-attachment: fixed;
+            background-size: cover; 
+            background-color: #f4f4f4; /* Warna fallback */
+            /* ---------------------------- */
+        }
+        .container {
+            max-width: 95%; 
+            margin: auto;
+            background: rgba(255, 255, 255, 0.6); /* Sedikit lebih solid untuk keterbacaan */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: relative; /* Penting untuk menjaga elemen di atas salju */
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            resize: vertical;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        /* Styling untuk semua tombol */
+        button {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+            margin-right: 10px; 
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Styling spesifik untuk Find and Replace */
+        .find-replace-area {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            background-color: #eaf6ff;
+        }
+        .find-replace-area input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-right: 10px;
+            width: 300px; 
+            box-sizing: border-box;
+        }
+        #findReplaceButton {
+            background-color: #dc3545; 
+        }
+        #findReplaceButton:hover {
+            background-color: #c82333;
+        }
+        
+        /* Styling spesifik untuk tombol Copy */
+        .copy-area button {
+            background-color: #3498db; 
+            margin-right: 10px;
+            margin-bottom: 0px;
+        }
+        .copy-area button:hover {
+            background-color: #2980b9;
+        }
+        .copy-area {
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            background-color: #f0fff0;
+        }
+
+        /* Styling untuk Tabel Hasil */
+        #outputResult table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background-color: white; /* Pastikan tabel terlihat di atas background transparan */
+        }
+        #outputResult th, #outputResult td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        #outputResult th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        #outputResult tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        /* Styling tambahan untuk kolom Total */
+        .col-total { text-align: right; font-weight: bold; }
+        .message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .success-message {
+            color: green;
+        }
+        .error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id='snow-container'></div> 
+    <div class="container">
+        <h2>Konverter Data</h2>
+
+        <label for="inputData">Masukkan Data Anda di Bawah:</label>
+        <textarea 
+            id="inputData" 
+            rows="10" 
+            placeholder='Pastekan data yang memiliki format seperti gambar di sini. Baris pertama harus berisi Header/Kolom.'>
+        </textarea>
+
+        <button id="convertButton" onclick="handleConvert()">
+            Convert
+        </button>
+
+        <div class="find-replace-area">
+            <h4>Pencarian dan Penghapusan (Kolom Komentar)</h4>
+            <label for="searchText">Hapus Teks/Kata:</label>
+            <input type="text" id="searchText" placeholder="Teks yang akan dihapus">
+            <button id="findReplaceButton" onclick="handleFindAndReplace()">
+                🗑️ Cari dan Hapus
+            </button>
+            <div id="replaceMessage" class="message"></div>
+        </div>
+        <div class="copy-area">
+            <h4>Penyalinan Cepat</h4>
+            <button id="copyCommentTotalButton" onclick="handleCopyCommentAndTotal()">
+                📋 Copy Komentar & Total (Hanya Data)
+            </button>
+            <button id="copyUsernameButton" onclick="handleCopyUsername()">
+                📋 Copy Username (Hanya Data)
+            </button>
+            <div id="copyMessage" class="message"></div>
+        </div>
+        <div id="outputResult">
+        </div>
+    </div>
+
+    <script>
+        // Urutan Kolom yang Dipilih: No (0), Komentar (8), Total (5), Username (2)
+        const selectedColumnsIndices = [0, 8, 5, 2]; 
+        
+        // Indeks kolom di dalam tabel HASIL
+        const commentColumnIndex = selectedColumnsIndices.indexOf(8); // Index 1
+        const totalColumnIndex = selectedColumnsIndices.indexOf(5);    // Index 2
+        const usernameColumnIndex = selectedColumnsIndices.indexOf(2);  // Index 3
+
+        // --- FUNGSI UTAMA UNTUK CONVERT ---
+        function handleConvert() {
+            const rawData = document.getElementById('inputData').value;
+            const outputArea = document.getElementById('outputResult');
+            document.getElementById('replaceMessage').innerHTML = ''; 
+            document.getElementById('copyMessage').innerHTML = '';   
+
+            if (rawData.trim() === "") {
+                outputArea.innerHTML = "<p class='error-message'>⚠️ Harap masukkan data terlebih dahulu!</p>";
+                return;
+            }
+
+            const parts = rawData.match(/"[^"]*"|[^"]+/g);
+            const numColumnsTotal = 9; 
+
+            if (!parts || parts.length < numColumnsTotal) { 
+                outputArea.innerHTML = "<p class='message' style='color: orange;'>⚠️ Data tidak valid atau tidak lengkap.</p>";
+                return;
+            }
+
+            const cleanedValues = parts
+                .map(p => p.trim())
+                .filter(p => p.length > 0 && p !== '"' && p !== ','); 
+
+            const headersAll = cleanedValues.slice(0, numColumnsTotal);
+            const dataRowsAll = cleanedValues.slice(numColumnsTotal);
+
+            if (dataRowsAll.length < numColumnsTotal) {
+                    outputArea.innerHTML = "<p class='message' style='color: orange;'>⚠️ Tidak ada data untuk dikonversi selain header.</p>";
+                    return;
+            }
+
+            const selectedHeaders = [];
+            selectedColumnsIndices.forEach(index => {
+                if (headersAll[index]) {
+                    selectedHeaders.push(headersAll[index].replace(/^"|"$/g, '').trim());
+                }
+            });
+
+            // --- Membuat HTML Tabel ---
+            let tableHTML = '<h3>Hasil Filtered</h3>';
+            tableHTML += '<table id="convertedTable">'; 
+            
+            // Header
+            tableHTML += '<thead><tr>';
+            selectedHeaders.forEach(header => {
+                const isTotalCol = (header.toLowerCase() === 'total');
+                const cssClass = isTotalCol ? 'col-total' : '';
+                tableHTML += `<th class="${cssClass}">${header}</th>`;
+            });
+            tableHTML += '</tr></thead>';
+
+            // Baris Data
+            tableHTML += '<tbody>';
+            for (let i = 0; i < dataRowsAll.length; i += numColumnsTotal) {
+                const rowDataFull = dataRowsAll.slice(i, i + numColumnsTotal);
+
+                if (rowDataFull.length === numColumnsTotal) {
+                    tableHTML += '<tr>';
+                    
+                    selectedColumnsIndices.forEach(index => {
+                        const cellData = rowDataFull[index];
+                        const cleanCellData = cellData ? cellData.replace(/^"|"$/g, '').trim().replace(/\n/g, '<br>') : '';
+
+                        const isTotalCol = (index === 5);
+                        const cssClass = isTotalCol ? 'col-total' : '';
+                        
+                        tableHTML += `<td class="${cssClass}">${cleanCellData}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                }
+            }
+            
+            tableHTML += '</tbody>';
+            tableHTML += '</table>';
+
+            // Tampilkan Tabel
+            outputArea.innerHTML = tableHTML;
+        }
+        
+        // --- FUNGSI UNTUK FIND AND DELETE ---
+        function handleFindAndReplace() {
+            const searchText = document.getElementById('searchText').value.trim();
+            const replaceText = ''; 
+            const table = document.getElementById('convertedTable');
+            const replaceMessage = document.getElementById('replaceMessage');
+            let replaceCount = 0;
+
+            if (!table) {
+                replaceMessage.innerHTML = "<p class='error-message'>⚠️ Harap konversi data terlebih dahulu.</p>";
+                return;
+            }
+
+            if (searchText === "") {
+                replaceMessage.innerHTML = "<p class='error-message'>⚠️ Teks yang akan dihapus tidak boleh kosong.</p>";
+                return;
+            }
+
+            const rows = table.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+
+                if (cells.length > commentColumnIndex) {
+                    const commentCell = cells[commentColumnIndex];
+                    let originalHTML = commentCell.innerHTML;
+                    
+                    const searchRegex = new RegExp(searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+                    
+                    const newHTML = originalHTML.replace(searchRegex, replaceText);
+                    
+                    if (originalHTML !== newHTML) {
+                        commentCell.innerHTML = newHTML;
+                        const matches = originalHTML.match(searchRegex);
+                        if (matches) {
+                            replaceCount += matches.length;
+                        }
+                    }
+                }
+            });
+
+            if (replaceCount > 0) {
+                replaceMessage.innerHTML = `<p class="success-message">✅ Berhasil **menghapus** ${replaceCount} kemunculan di kolom Komentar.</p>`;
+            } else {
+                replaceMessage.innerHTML = "<p class='message' style='color: orange;'>ℹ️ Tidak ditemukan kemunculan teks yang dicari.</p>";
+            }
+        }
+
+        // --- FUNGSI COPY (TANPA HEADER) ---
+        async function copyDataToClipboard(data) {
+            const copyMessage = document.getElementById('copyMessage');
+            try {
+                await navigator.clipboard.writeText(data);
+                copyMessage.innerHTML = "<p class='success-message'>✅ Data berhasil disalin ke clipboard!</p>";
+            } catch (err) {
+                copyMessage.innerHTML = `<p class='error-message'>❌ Gagal menyalin: ${err}</p>`;
+                console.error('Copy failed: ', err);
+            }
+        }
+        
+        function extractColumnData(columnIndex) {
+            const table = document.getElementById('convertedTable');
+            const copyMessage = document.getElementById('copyMessage');
+
+            if (!table) {
+                copyMessage.innerHTML = "<p class='error-message'>⚠️ Harap konversi data terlebih dahulu.</p>";
+                return null;
+            }
+
+            const rows = table.querySelectorAll('tbody tr');
+            const dataArray = [];
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > columnIndex) {
+                    let cellData = cells[columnIndex].textContent.trim();
+                    dataArray.push(cellData);
+                }
+            });
+            return dataArray;
+        }
+
+        function handleCopyCommentAndTotal() {
+            const commentData = extractColumnData(commentColumnIndex);
+            const totalData = extractColumnData(totalColumnIndex);
+            
+            if (!commentData || !totalData || commentData.length !== totalData.length) {
+                return; 
+            }
+
+            let combinedData = [];
+            for (let i = 0; i < commentData.length; i++) {
+                combinedData.push(commentData[i] + '\t' + totalData[i]);
+            }
+            
+            const finalData = combinedData.join('\n');
+            
+            copyDataToClipboard(finalData);
+        }
+
+        function handleCopyUsername() {
+            const usernameData = extractColumnData(usernameColumnIndex);
+
+            if (!usernameData) {
+                return; 
+            }
+            
+            const finalData = usernameData.join('\n');
+
+            copyDataToClipboard(finalData);
+        }
+        
+        // --- SCRIPT UNTUK EFEK SALJU JATUH ---
+        const snowContainer = document.getElementById('snow-container');
+        const totalSnowflakes = 50; 
+        const snowflakes = ['❄️', '❅', '❆', '*'];
+
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            
+            // Pilih karakter salju acak
+            snowflake.innerHTML = snowflakes[Math.floor(Math.random() * snowflakes.length)]; 
+
+            // Posisi X acak
+            snowflake.style.left = `${Math.random() * 100}%`; 
+
+            // Durasi jatuh acak (antara 5s dan 15s)
+            const duration = Math.random() * 10 + 5; 
+            snowflake.style.animationDuration = `${duration}s`;
+
+            // Delay awal acak agar tidak jatuh bersamaan
+            snowflake.style.animationDelay = `${Math.random() * 10}s`; 
+
+            // Animasi CSS
+            snowflake.style.animationName = 'fall';
+            snowflake.style.animationIterationCount = 'infinite';
+            snowflake.style.opacity = Math.random() * 0.5 + 0.5; // Opasitas acak
+
+            snowContainer.appendChild(snowflake);
+
+            // Hapus elemen salju setelah jatuh (opsional, untuk mencegah kelebihan elemen)
+            snowflake.addEventListener('animationend', function() {
+                this.remove();
+                // Buat salju baru untuk menjaga jumlah salju
+                createSnowflake(); 
+            });
+        }
+
+        // Buat salju sejumlah totalSnowflakes saat halaman dimuat
+        for (let i = 0; i < totalSnowflakes; i++) {
+            // Gunakan setTimeout agar tidak memblokir render halaman awal
+            setTimeout(createSnowflake, Math.random() * 5000); 
+        }
+        // ------------------------------------
+
+    </script>
+
+</body>
+</html>
