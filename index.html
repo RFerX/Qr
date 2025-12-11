@@ -159,17 +159,14 @@
 
         <div class="find-replace-area">
             <h4>Filtering</h4>
-            
-            <button id="cleanCommentButton" onclick="handleCleanCommentColumn()">
-                🧹 Delete Line 2
-            </button>
-            
-            <br style="margin-top: 10px;">
-
+			
             <label for="searchText">Delete Text:</label>
             <input type="text" id="searchText" placeholder="Teks yang akan dihapus">
             <button id="findReplaceButton" onclick="handleFindAndReplace()">
                 🗑️ Find & Delete
+            </button>
+			<button id="cleanCommentButton" onclick="handleCleanCommentColumn()">
+                🧹 Delete Line 2
             </button>
             <div id="replaceMessage" class="message"></div>
         </div>
