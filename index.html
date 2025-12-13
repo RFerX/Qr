@@ -7,7 +7,7 @@
     <style>
         /* --- STYLING EFEK SALJU JATUH --- */
         .snowflake {
-            color: #fff;
+            color: #fff; /* Salju Putih */
             font-size: 1.5em;
             font-family: Arial, sans-serif;
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
@@ -24,120 +24,151 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            background-image: url('bg.jpg'); /* Pastikan file bg.jpg ada */
+            /* Pastikan file bg.jpg ada, atau hapus baris berikut jika tidak menggunakannya */
+            background-image: url('https://i.ibb.co/Z6gwNhKF/bg.jpg'); 
             background-attachment: fixed;
             background-size: cover; 
-            background-color: #f4f4f4; 
+            background-color: #e3f2fd; /* Biru Sangat Pucat / Salju */
+            color: #01579b; /* Biru Es Tua, untuk Teks Utama */
         }
         .container {
             max-width: 95%; 
             margin: auto;
-            background: rgba(255, 255, 255, 0.1); 
+            background: rgba(255, 255, 255, 0.3); /* Putih dengan sedikit transparansi (Balok Es) */
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 12px; /* Lebih membulat */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Bayangan yang lebih lembut */
+            border: 1px solid #b3e5fc; /* Border Biru Muda Seperti Es */
             position: relative; 
+            backdrop-filter: blur(3px); /* Efek es yang sedikit buram */
         }
+
+        h2, h4 {
+            color: #0288d1; /* Biru Es yang Cerah */
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.95);
+        }
+
         textarea {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 2px solid #b3e5fc; /* Border Biru Muda */
+            border-radius: 6px;
             box-sizing: border-box;
             resize: vertical;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #01579b;
+            font-size: 14px;
         }
+        
+        /* STYLING TOMBOL UMUM */
         button {
-            background-color: #5cb85c;
+            background-color: #0288d1; /* Biru Es Medium */
             color: white;
             padding: 10px 15px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 10px; 
             margin-right: 10px; 
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.1s;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         button:hover {
-            background-color: #4cae4c;
+            background-color: #039be5; /* Lebih cerah saat hover */
+            transform: translateY(-1px); /* Efek sedikit terangkat */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
+
+        /* AREA FILTERING */
         .find-replace-area {
-            border: 1px solid #ddd;
+            border: 1px solid #90caf9;
             padding: 15px;
-            border-radius: 4px;
+            border-radius: 8px;
             margin-bottom: 20px;
-            background-color: #eaf6ff;
+            background-color: #e3f2fd; /* Biru Pucat Sekali */
         }
         .find-replace-area input[type="text"] {
             padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
+            border: 2px solid #90caf9;
+            border-radius: 4px;
             margin-right: 10px;
             width: 300px; 
             box-sizing: border-box;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #01579b;
         }
+
+        /* TOMBOL KHUSUS */
         #findReplaceButton {
-            background-color: #dc3545; 
+            background-color: #d32f2f; /* Merah untuk Delete */
         }
         #findReplaceButton:hover {
-            background-color: #c82333;
-        }
-        .copy-area button {
-            background-color: #3498db; 
-            margin-right: 10px;
-            margin-bottom: 0px;
-        }
-        .copy-area button:hover {
-            background-color: #2980b9;
-        }
-        .copy-area {
-            border: 1px solid #ccc;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            background-color: #f0fff0;
+            background-color: #e53935;
         }
         #cleanCommentButton {
-            background-color: #ffc107; 
-            color: #333;
-            font-weight: bold;
+            background-color: #4fc3f7; /* Biru Salju/Sky Blue */
+            color: #fff;
         }
         #cleanCommentButton:hover {
-            background-color: #e0a800;
+            background-color: #29b6f6;
         }
+
+        /* AREA COPYING */
+        .copy-area {
+            border: 1px solid #c8e6c9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background-color: #f1f8e9; /* Hijau Pucat (Warna Kontras Lembut) */
+        }
+        .copy-area button {
+            background-color: #00bcd4; /* Cyan/Biru Es untuk Copy */
+        }
+        .copy-area button:hover {
+            background-color: #00acc1;
+        }
+
+        /* HASIL OUTPUT DAN TABEL */
         #outputResult table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
             background-color: white; 
+            border: 1px solid #b3e5fc;
+            border-radius: 8px;
+            overflow: hidden; /* Untuk membulatkan sudut tabel */
         }
         #outputResult th, #outputResult td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solid #e1f5fe; /* Garis tabel yang sangat tipis dan pucat */
+            padding: 10px 8px;
             text-align: left;
             vertical-align: top;
         }
         #outputResult th {
-            background-color: #f2f2f2;
+            background-color: #b3e5fc; /* Header Biru Muda */
+            color: #01579b;
             font-weight: bold;
             white-space: nowrap;
         }
         #outputResult tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f5faff; /* Baris genap putih pucat kebiruan */
         }
         .col-total { text-align: right; font-weight: bold; }
+
+        /* PESAN */
         .message {
             margin-top: 10px;
             font-weight: bold;
         }
         .success-message {
-            color: green;
+            color: #00bcd4; /* Cyan/Biru Cerah */
         }
         .error-message {
-            color: red;
+            color: #ef5350; /* Merah untuk error */
         }
     </style>
 </head>
@@ -205,6 +236,7 @@
                 return;
             }
 
+            // Memisahkan data, menangani tanda kutip ganda pada sel
             const parts = rawData.match(/"[^"]*"|[^"]+/g);
             const numColumnsTotal = 9; 
 
@@ -240,11 +272,10 @@
                 }
             }
 
-            // --- LANGKAH BARU: SORTING BERDASARKAN KOLOM NO (Index 0) SECARA DESCENDING ---
-            const noColumnIndex = 0; // Kolom "No" selalu berada di index 0 di dataRowsAll
+            // --- SORTING BERDASARKAN KOLOM NO (Index 0) SECARA DESCENDING ---
+            const noColumnIndex = 0; 
 
             fullRowsData.sort((rowA, rowB) => {
-                // Hapus tanda kutip ganda dan konversi ke angka untuk perbandingan numerik
                 const numA = parseInt(rowA[noColumnIndex].replace(/"/g, '').trim());
                 const numB = parseInt(rowB[noColumnIndex].replace(/"/g, '').trim());
 
@@ -329,7 +360,7 @@
             });
 
             if (cleanCount > 0) {
-                replaceMessage.innerHTML = `<p class="success-message">🧹 No second line found to clear</p>`;
+                replaceMessage.innerHTML = `<p class="success-message">🧹 Succeed **delete** ${cleanCount} row second line</p>`;
             } else {
                 replaceMessage.innerHTML = "<p class='message' style='color: orange;'>ℹ️ No second line found to delete.</p>";
             }
@@ -362,6 +393,7 @@
                     const commentCell = cells[commentColumnIndex];
                     let originalHTML = commentCell.innerHTML;
                     
+                    // Membuat regex dari searchText, menghindari karakter khusus, dan mencari secara global dan case-insensitive
                     const searchRegex = new RegExp(searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
                     
                     const newHTML = originalHTML.replace(searchRegex, replaceText);
@@ -410,6 +442,7 @@
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 if (cells.length > columnIndex) {
+                    // Menggunakan textContent untuk mendapatkan teks tanpa tag <br>
                     let cellData = cells[columnIndex].textContent.trim(); 
                     dataArray.push(cellData);
                 }
@@ -426,6 +459,7 @@
             }
 
             let combinedData = [];
+            // Menggabungkan dengan tab (\t) agar mudah dipaste di spreadsheet
             for (let i = 0; i < commentData.length; i++) {
                 combinedData.push(commentData[i] + '\t' + totalData[i]); 
             }
@@ -470,6 +504,7 @@
 
             snowContainer.appendChild(snowflake);
 
+            // Membuat salju baru setelah yang lama selesai/dihapus
             snowflake.addEventListener('animationend', function() {
                 this.remove();
                 createSnowflake(); 
@@ -477,6 +512,7 @@
         }
 
         for (let i = 0; i < totalSnowflakes; i++) {
+            // Memberikan jeda waktu acak agar salju tidak jatuh serentak
             setTimeout(createSnowflake, Math.random() * 5000); 
         }
         // ------------------------------------
