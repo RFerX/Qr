@@ -217,7 +217,7 @@
 
     <script>
         // Urutan Kolom yang Dipilih: No (0), Komentar (8), Total (5), Username (2)
-        const selectedColumnsIndices = [0, 8, 5, 2]; 
+        const selectedColumnsIndices = [0, 8, 5, 2];
         
         // Indeks kolom di dalam tabel HASIL
         const commentColumnIndex = selectedColumnsIndices.indexOf(8); // Index 1
@@ -228,7 +228,7 @@
         function handleConvert() {
             const rawData = document.getElementById('inputData').value;
             const outputArea = document.getElementById('outputResult');
-            document.getElementById('replaceMessage').innerHTML = ''; 
+            document.getElementById('replaceMessage').innerHTML = '';
             document.getElementById('copyMessage').innerHTML = '';    
 
             if (rawData.trim() === "") {
@@ -238,16 +238,16 @@
 
             // Memisahkan data, menangani tanda kutip ganda pada sel
             const parts = rawData.match(/"[^"]*"|[^"]+/g);
-            const numColumnsTotal = 9; 
+            const numColumnsTotal = 9;
 
-            if (!parts || parts.length < numColumnsTotal) { 
+            if (!parts || parts.length < numColumnsTotal) {
                 outputArea.innerHTML = "<p class='message' style='color: orange;'>⚠️ Invalid or incomplete data.</p>";
                 return;
             }
 
             const cleanedValues = parts
                 .map(p => p.trim())
-                .filter(p => p.length > 0 && p !== '"' && p !== ','); 
+                .filter(p => p.length > 0 && p !== '"' && p !== ',');    
 
             const headersAll = cleanedValues.slice(0, numColumnsTotal);
             const dataRowsAll = cleanedValues.slice(numColumnsTotal);
@@ -264,16 +264,25 @@
                 }
             });
 
-            // --- LOGIKA PENGUMPULAN DATA BARIS PENUH ---
+            // --- LOGIKA PENGUMPULAN DATA BARIS PENUH (SUDAH DIFILTER HEADER DUPLIKAT) ---
             const fullRowsData = [];
             for (let i = 0; i < dataRowsAll.length; i += numColumnsTotal) {
-                if (dataRowsAll.slice(i, i + numColumnsTotal).length === numColumnsTotal) {
-                    fullRowsData.push(dataRowsAll.slice(i, i + numColumnsTotal));
+                const rowCandidate = dataRowsAll.slice(i, i + numColumnsTotal);
+                
+                // Pastikan baris memiliki jumlah kolom yang tepat
+                if (rowCandidate.length === numColumnsTotal) {
+                    // Ambil nilai Kolom No (Index 0) dan bersihkan dari tanda kutip
+                    const noValue = rowCandidate[0].replace(/^"|"$/g, '').trim();
+
+                    // FILTER: Abaikan baris jika nilai pertamanya adalah "No" atau "No Referensi" (header duplikat)
+                    if (noValue.toLowerCase() !== 'no' && noValue.toLowerCase() !== 'no referensi') {
+                         fullRowsData.push(rowCandidate);
+                    }
                 }
             }
-
+            
             // --- SORTING BERDASARKAN KOLOM NO (Index 0) SECARA DESCENDING ---
-            const noColumnIndex = 0; 
+            const noColumnIndex = 0;    
 
             fullRowsData.sort((rowA, rowB) => {
                 const numA = parseInt(rowA[noColumnIndex].replace(/"/g, '').trim());
@@ -285,7 +294,7 @@
 
             // --- Membuat HTML Tabel ---
             let tableHTML = '<h3>Filter Results</h3>';
-            tableHTML += '<table id="convertedTable">'; 
+            tableHTML += '<table id="convertedTable">';    
             
             // Header
             tableHTML += '<thead><tr>';
@@ -325,7 +334,7 @@
         // --- FUNGSI HAPUS BARIS KEDUA (Menargetkan tag <br>) ---
         function handleCleanCommentColumn() {
             const table = document.getElementById('convertedTable');
-            const replaceMessage = document.getElementById('replaceMessage'); 
+            const replaceMessage = document.getElementById('replaceMessage');    
             const copyMessage = document.getElementById('copyMessage');
             let cleanCount = 0;
 
@@ -353,7 +362,7 @@
                     let newHTML = originalHTML.replace(searchRegex, '').trim();
 
                     if (originalHTML !== newHTML) {
-                        commentCell.innerHTML = newHTML; 
+                        commentCell.innerHTML = newHTML;    
                         cleanCount++;
                     }
                 }
@@ -369,7 +378,7 @@
         // --- FUNGSI UNTUK FIND AND DELETE (Teks Manual) ---
         function handleFindAndReplace() {
             const searchText = document.getElementById('searchText').value.trim();
-            const replaceText = ''; 
+            const replaceText = '';    
             const table = document.getElementById('convertedTable');
             const replaceMessage = document.getElementById('replaceMessage');
             let replaceCount = 0;
@@ -443,7 +452,7 @@
                 const cells = row.querySelectorAll('td');
                 if (cells.length > columnIndex) {
                     // Menggunakan textContent untuk mendapatkan teks tanpa tag <br>
-                    let cellData = cells[columnIndex].textContent.trim(); 
+                    let cellData = cells[columnIndex].textContent.trim();    
                     dataArray.push(cellData);
                 }
             });
@@ -455,13 +464,13 @@
             const totalData = extractColumnData(totalColumnIndex);
             
             if (!commentData || !totalData || commentData.length !== totalData.length) {
-                return; 
+                return;    
             }
 
             let combinedData = [];
             // Menggabungkan dengan tab (\t) agar mudah dipaste di spreadsheet
             for (let i = 0; i < commentData.length; i++) {
-                combinedData.push(commentData[i] + '\t' + totalData[i]); 
+                combinedData.push(commentData[i] + '\t' + totalData[i]);    
             }
             
             const finalData = combinedData.join('\n');
@@ -473,7 +482,7 @@
             const usernameData = extractColumnData(usernameColumnIndex);
 
             if (!usernameData) {
-                return; 
+                return;    
             }
             
             const finalData = usernameData.join('\n');
@@ -483,37 +492,37 @@
         
         // --- SCRIPT UNTUK EFEK SALJU JATUH ---
         const snowContainer = document.getElementById('snow-container');
-        const totalSnowflakes = 50; 
+        const totalSnowflakes = 50;    
         const snowflakes = ['❄️', '❅', '❆', '*'];
 
         function createSnowflake() {
             const snowflake = document.createElement('div');
             snowflake.classList.add('snowflake');
             
-            snowflake.innerHTML = snowflakes[Math.floor(Math.random() * snowflakes.length)]; 
+            snowflake.innerHTML = snowflakes[Math.floor(Math.random() * snowflakes.length)];    
 
-            const duration = Math.random() * 10 + 5; 
+            const duration = Math.random() * 10 + 5;    
             snowflake.style.animationDuration = `${duration}s`;
 
-            snowflake.style.left = `${Math.random() * 100}%`; 
-            snowflake.style.animationDelay = `${Math.random() * 10}s`; 
+            snowflake.style.left = `${Math.random() * 100}%`;    
+            snowflake.style.animationDelay = `${Math.random() * 10}s`;    
 
             snowflake.style.animationName = 'fall';
             snowflake.style.animationIterationCount = 'infinite';
-            snowflake.style.opacity = Math.random() * 0.5 + 0.5; 
+            snowflake.style.opacity = Math.random() * 0.5 + 0.5;    
 
             snowContainer.appendChild(snowflake);
 
             // Membuat salju baru setelah yang lama selesai/dihapus
             snowflake.addEventListener('animationend', function() {
                 this.remove();
-                createSnowflake(); 
+                createSnowflake();    
             });
         }
 
         for (let i = 0; i < totalSnowflakes; i++) {
             // Memberikan jeda waktu acak agar salju tidak jatuh serentak
-            setTimeout(createSnowflake, Math.random() * 5000); 
+            setTimeout(createSnowflake, Math.random() * 5000);    
         }
         // ------------------------------------
 
