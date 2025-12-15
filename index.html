@@ -44,15 +44,30 @@
             backdrop-filter: blur(3px); /* Efek es yang sedikit buram */
         }
 
-        h2, h4 {
+        h2 {
+            color: #0288d1; /* Biru Es yang Cerah */
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.95);
+			font-size:25px;
+        }
+		
+		h4 {
             color: #0288d1; /* Biru Es yang Cerah */
             text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.95);
         }
+		
+		.header-controls {
+			display: flex; /* Aktifkan Flexbox */
+			justify-content: space-between; /* Pisahkan elemen (judul di kiri, tombol di kanan) */
+			align-items: center; /* Sejajarkan secara vertikal di tengah */
+		}
+		.header-controls h2 {
+			margin: 0; 
+		}
 
         textarea {
             width: 100%;
             padding: 10px;
-            margin-bottom:5px;
+            margin-bottom:15px;
             border: 2px solid #b3e5fc; /* Border Biru Muda */
             border-radius: 6px;
             box-sizing: border-box;
@@ -176,17 +191,17 @@
 <body>
     <div id='snow-container'></div> 
     <div class="container">
+    <div class="header-controls">
         <h2>Convert Data</h2>
-
-        <textarea 
-            id="inputData" 
-            rows="10" 
-            placeholder='Input your data below....'
-        ></textarea>
-
         <button id="convertButton" onclick="handleConvert()">
             Convert
         </button>
+    </div>
+    <textarea 
+        id="inputData" 
+        rows="10" 
+        placeholder='Input your data below....'
+    ></textarea>
 
         <div class="find-replace-area">
             <h4>Filtering</h4>
